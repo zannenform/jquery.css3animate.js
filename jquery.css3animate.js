@@ -1,37 +1,12 @@
 /**
- * css3animate ([from,] to [,options] [,complete])
- *  from
- *    Type : PlaneObject
- *    動作開始時のCSSプロパティ
- *  to
- *    Type :  PlaneObject
- *    動作完了時のCSSプロパティ
- *  options
- *    Type : PlaneObject
- *    CSS3 のAnimaionメソッドに定義されたの各種オプション。
- *    duration (default: 400)
- *      Type : Number
- *      animation-durationに相当。msで指定。
- *    fillMode (default: both)
- *      Type : String
- *      animation-fill-modeに相当。
- *    delay (default: 0)
- *      Type : Number
- *      animation-delayに相当。msで指定。
- *    timingFunction (default: ease)
- *      Type : String
- *      animation-timing-functionに相当。
- *    iterationCount (default: 1)
- *      Type : String
- *      animation-iteration-countに相当。
- *    direction (default: normal)
- *      Type : String
- *      animation-directionに相当。
- *  complete
- *    Type : function()
- *    動作完了時に実行されるファンクション
- *    
+ * jquery.css3animate.js v1.0.0
+ *
+ * Copyright 2013 Zannen Form
+ * Released under the MIT license
+ * 
+ * Date: 2013-05-12
  */
+
 (function(module) {
   if (typeof define === 'function' && define.amd) {
     // AMD に対応している場合
