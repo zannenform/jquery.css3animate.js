@@ -1,10 +1,10 @@
 /**
- * jquery.css3animate.js v1.0.0
+ * jquery.css3animate.js v1.0.1
  *
  * Copyright 2013 Zannen Form
  * Released under the MIT license
  * 
- * Date: 2013-05-12
+ * Date: 2013-05-19
  */
 
 (function(module) {
@@ -141,30 +141,30 @@
        */
       var parseOptions = function(options){
         var rtn = false;
-        if(options['duration']){
+        if(options['duration'] != undefined){
           duration = options['duration'] + 'ms';
           rtn = true;
         }
-        if(options['fillMode']){
+        if(options['fillMode'] != undefined){
           fillMode = options['fillMode'];
           rtn = true;
         }
-        if(options['delay']){
+        if(options['delay'] != undefined){
           delay = options['delay'] + 'ms';
           rtn = true;
         }
-        if(options['timingFunction']){
+        if(options['timingFunction'] != undefined){
           timingFunction = options['timingFunction'];
           rtn = true;
         }
-        if(options['iterationCount']){
+        if(options['iterationCount'] != undefined){
           iterationCount = options['iterationCount'];
           if(typeof iterationCount == 'number'){
             iterationCount = String(iterationCount);
           }
           rtn = true;
         }
-        if(options['direction']){
+        if(options['direction'] != undefined){
           direction = options['direction'];
           rtn = true;
         }
@@ -206,9 +206,9 @@
       // 実行アニメーションのハッシュキーを保持する
       var tmpIsAnima = target.data('isAnima');
       if (tmpIsAnima !== undefined) {
-        // すでに実行中のアニメーションの確認
+        // 過去のアニメーションの確認
         for (key in tmpIsAnima) {
-          // 実行中のスタイルシートを削除する
+          // 過去のスタイルシートを削除する
           $(styleArr[tmpIsAnima[key]]).remove();
           target.off('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd');
           target.data('isAnima').splice(key, 1);
@@ -230,16 +230,6 @@
             // コールバック処理
             if(typeof complete === 'function'){
               complete(e);
-            }
-            // スタイルシートを削除する
-            $(styleArr[hash]).remove();
-
-            // 実行中ハッシュキーを削除
-            var tmpIsAnima = target.data('isAnima');
-            for(key in tmpIsAnima){
-              if(tmpIsAnima[key] == hash){
-                target.data('isAnima').splice(key, 1);
-              }
             }
           }
       );
