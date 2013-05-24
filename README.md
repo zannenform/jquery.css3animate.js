@@ -59,7 +59,8 @@ CSS3 アニメーションの animation-delayに相当。単位は ms。
 
 * timingFunction (default: ease)  
 Type : String  
-CSS3 アニメーションの animation-timing-functionに相当。  
+CSS3 アニメーションの animation-timing-functionに相当。
+独自プリセットあり。
 
 * iterationCount (default: 1)  
 Type : String, Number  
@@ -68,6 +69,35 @@ CSS3 アニメーションの animation-iteration-countに相当。
 * direction (default: normal)  
 Type : String  
 CSS3 アニメーションの animation-directionに相当。  
+
+
+### timingFunction のプリセット
+* ease
+* ease-in
+* ease-out
+* ease-in-out
+* linear
+* expo-in
+* expo-out
+* expo-in-out
+* circ-in
+* circ-out
+* circ-in-out
+* sine-in
+* sine-out
+* sine-in-out
+* quad-in
+* quad-out
+* quad-in-out
+* cubic-in
+* cubic-out
+* cubic-in-out
+* quart-in
+* quart-out
+* quart-in-out
+* quint-in
+* quint-out
+* quint-in-out
 
 
 ## ライセンス

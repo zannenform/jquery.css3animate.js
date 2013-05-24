@@ -1,10 +1,10 @@
 /**
- * jquery.css3animate.js v1.0.1
+ * jquery.css3animate.js v1.1.0
  *
  * Copyright 2013 Zannen Form
  * Released under the MIT license
  * 
- * Date: 2013-05-19
+ * Date: 2013-05-25
  */
 
 (function(module) {
@@ -155,6 +155,71 @@
         }
         if(options['timingFunction'] != undefined){
           timingFunction = options['timingFunction'];
+          switch(timingFunction){
+            case 'expo-in':
+              timingFunction = 'cubic-bezier(0.71,0.01,0.83,0)';
+              break;
+            case 'expo-out':
+              timingFunction = 'cubic-bezier(0.14,1,0.32,0.99)';
+              break;
+            case 'expo-in-out':
+              timingFunction = 'cubic-bezier(0.85,0,0.15,1)';
+              break;
+            case 'circ-in':
+              timingFunction = 'cubic-bezier(0.34,0,0.96,0.23)';
+              break;
+            case 'circ-out':
+              timingFunction = 'cubic-bezier(0,0.5,0.37,0.98)';
+              break;
+            case 'circ-in-out':
+              timingFunction = 'cubic-bezier(0.88,0.1,0.12,0.9)';
+              break;
+            case 'sine-in':
+              timingFunction = 'cubic-bezier(0.22,0.04,0.36,0)';
+              break;
+            case 'sine-out':
+              timingFunction = 'cubic-bezier(0.04,0,0.5,1)';
+              break;
+            case 'sine-in-out':
+              timingFunction = 'cubic-bezier(0.37,0.01,0.63,1)';
+              break;
+            case 'quad-in':
+              timingFunction = 'cubic-bezier(0.14,0.01,0.49,0)';
+              break;
+            case 'quad-out':
+              timingFunction = 'cubic-bezier(0.01,0,0.43,1)';
+              break;
+            case 'quad-in-out':
+              timingFunction = 'cubic-bezier(0.47,0.04,0.53,0.96)';
+              break;
+            case 'cubic-in':
+              timingFunction = 'cubic-bezier(0.35,0,0.65,0)';
+              break;
+            case 'cubic-out':
+              timingFunction = 'cubic-bezier(0.09,0.25,0.24,1)';
+              break;
+            case 'cubic-in-out':
+              timingFunction = 'cubic-bezier(0.66,0,0.34,1)';
+              break;
+            case 'quart-in':
+              timingFunction = 'cubic-bezier(0.69,0,0.76,0.17)';
+              break;
+            case 'quart-out':
+              timingFunction = 'cubic-bezier(0.26,0.96,0.44,1)';
+              break;
+            case 'quart-in-out':
+              timingFunction = 'cubic-bezier(0.76,0,0.24,1)';
+              break;
+            case 'quint-in':
+              timingFunction = 'cubic-bezier(0.64,0,0.78,0)';
+              break;
+            case 'quint-out':
+              timingFunction = 'cubic-bezier(0.22,1,0.35,1)';
+              break;
+            case 'quint-in-out':
+              timingFunction = 'cubic-bezier(0.9,0,0.1,1)';
+              break;            
+          }
           rtn = true;
         }
         if(options['iterationCount'] != undefined){
@@ -184,7 +249,6 @@
         return tmp;
       }
 
-
       // ルールをスタイルシートとして出力
       var tmpFrom = new Array,
           tmpTo = new Array;
@@ -202,7 +266,7 @@
       styleElm.appendChild(document.createTextNode('@' + vender + 'keyframes anim_' + hash + '{from{' + tmpFrom.join(';') + '} to{' + tmpTo.join(';') + '}}'));
       styleArr[hash] = styleElm;
       delete tmpFrom, tmpTo;
-      
+
       // 実行アニメーションのハッシュキーを保持する
       var tmpIsAnima = target.data('isAnima');
       if (tmpIsAnima !== undefined) {
