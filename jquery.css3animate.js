@@ -1,10 +1,10 @@
 /**
- * jquery.css3animate.js v1.1.0
+ * jquery.css3animate.js v1.2.0
  *
  * Copyright 2013 Zannen Form
  * Released under the MIT license
  * 
- * Date: 2013-05-25
+ * Date: 2013-05-27
  */
 
 (function(module) {
@@ -39,11 +39,34 @@
     styleArr = new Array,
     rulesArr = new Array;
 
+  // メソッド
+  var methods = {
+    start : function(elm){
+      $(elm).css(vender + 'animation-play-state', 'running');
+      return elm;
+    }, 
+    stop : function(elm){
+      $(elm).css(vender + 'animation-play-state', 'paused');
+      return elm;
+    },
+    toggle : function(elm){
+      if($(elm).css(vender + 'animation-play-state') == 'running'){
+        $(elm).css(vender + 'animation-play-state', 'paused');
+      }else{
+        $(elm).css(vender + 'animation-play-state', 'running');        
+      }
+      return elm;
+    },
+    status : function(elm){
+      return $(elm).css(vender + 'animation-play-state');
+    }
+  }
+  
   // jQueryメソッド拡張
   $.fn.extend({
     /**
      * 拡張メソッド
-     * @param  arg0  引数fromが入る
+     * @param  arg0  引数from、またはメソッド名が入る。
      * @param  arg1  引数の省略状況によって、to, options, complete のいずれかが入る
      * @param  arg2  引数の省略状況によって、options, complete のいずれかが入る
      * @param  arg3  引数の省略状況によって、completeが入る
@@ -62,6 +85,12 @@
         direction = 'normal',
         complete,
         hash = (+new Date());
+
+      // メソッド指定の場合はメソッドとして処理する
+      if(typeof arguments[0] === 'string'){
+        rtn = methods[arguments[0]](target);
+        return rtn;
+      }
 
       /**
        * 引数の設定
@@ -313,5 +342,4 @@
       return target;
     }
   });
-
 });
