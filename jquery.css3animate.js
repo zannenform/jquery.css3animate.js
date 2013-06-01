@@ -1,10 +1,10 @@
 /**
- * jquery.css3animate.js v1.2.0
+ * jquery.css3animate.js v1.3.0
  *
  * Copyright 2013 Zannen Form
  * Released under the MIT license
  * 
- * Date: 2013-05-27
+ * Date: 2013-06-01
  */
 
 (function(module) {
@@ -35,30 +35,296 @@
         return '';
       }
     })(),
+    // オプションのデフォルト値
+    defaults = {
+      'duration': '400ms',
+      'fillMode': 'both',
+      'delay': '0ms',
+      'timingFunction': 'ease',
+      'iterationCount': '1',
+      'direction': 'normal'
+    },
+    // タイミングファンクションのプリセット
+    timingFuncArr = {
+      'expo-in': 'cubic-bezier(0.71,0.01,0.83,0)',
+      'expo-out': 'cubic-bezier(0.14,1,0.32,0.99)',
+      'expo-in-out': 'cubic-bezier(0.85,0,0.15,1)',
+      'circ-in': 'cubic-bezier(0.34,0,0.96,0.23)',
+      'circ-out': 'cubic-bezier(0,0.5,0.37,0.98)',
+      'circ-in-out': 'cubic-bezier(0.88,0.1,0.12,0.9)',
+      'sine-in': 'cubic-bezier(0.22,0.04,0.36,0)',
+      'sine-out': 'cubic-bezier(0.04,0,0.5,1)',
+      'sine-in-out': 'cubic-bezier(0.37,0.01,0.63,1)',
+      'quad-in': 'cubic-bezier(0.14,0.01,0.49,0)',
+      'quad-out': 'cubic-bezier(0.01,0,0.43,1)',
+      'quad-in-out': 'cubic-bezier(0.47,0.04,0.53,0.96)',
+      'cubic-in': 'cubic-bezier(0.35,0,0.65,0)',
+      'cubic-out': 'cubic-bezier(0.09,0.25,0.24,1)',
+      'cubic-in-out': 'cubic-bezier(0.66,0,0.34,1)',
+      'quart-in': 'cubic-bezier(0.69,0,0.76,0.17)',
+      'quart-out': 'cubic-bezier(0.26,0.96,0.44,1)',
+      'quart-in-out': 'cubic-bezier(0.76,0,0.24,1)',
+      'quint-in': 'cubic-bezier(0.64,0,0.78,0)',
+      'quint-out': 'cubic-bezier(0.22,1,0.35,1)',
+      'quint-in-out': 'cubic-bezier(0.9,0,0.1,1)'
+    },
+    styleArr = new Array;
 
-    styleArr = new Array,
-    rulesArr = new Array;
+  /**
+   * 省略されたfromパラメータの設定
+   */
+  var setFrom = function(that){
+    var tmp = new Object;
+    var to = that.paramObj['to'];
+    var target = that.target;
+    for (key in to) {
+      tmp[key] = target.css(key);
+    }
+    that.paramObj['from'] = tmp;
+    delete tmp;
+  }
+
+  /**
+   * オプションを分解する
+   */
+  var parseOptions = function(that, options){
+    var isOption = false;
+    
+    for(key in options){
+      switch(key){
+        case 'duration':
+          that.optionObj['duration'] = options['duration'] + 'ms';
+          isOption = true;
+          break;
+        case 'fillMode':
+          that.optionObj['fillMode'] = options['fillMode'];
+          isOption = true;
+          break;
+        case 'delay':
+          that.optionObj['delay'] = options['delay'] + 'ms';
+          isOption = true;
+          break;
+        case 'timingFunction':
+          that.optionObj['timingFunction'] = timingFuncArr[options['timingFunction']];
+          if(that.optionObj['timingFunction'] == undefined){
+            that.optionObj['timingFunction'] = options['timingFunction'];
+          }
+          isOption = true;
+          break;
+        case 'iterationCount':
+          that.optionObj['iterationCount'] = options['iterationCount'];
+          if(typeof that.optionObj['iterationCount'] == 'number'){
+            that.optionObj['iterationCount'] = String(that.optionObj['iterationCount']);
+          }
+          isOption = true;
+          break;
+        case 'direction':
+          that.optionObj['direction'] = options['direction'];
+          isOption = true;
+          break;
+      }
+    }
+    if(isOption == true){
+      that.optionObj = $.extend({}, defaults, that.optionObj);
+    }
+    return isOption;
+  }
+
+  /**
+   * 引数の省略状況を判断して、適切なパラメーターに代入する
+   */
+  var setArgments = function(that){
+    var maxLength = that.args.length - 1;
+
+    // 指定 to 
+    if(maxLength === 0){
+      that.optionObj = defaults;
+      that.paramObj['to'] = that.args[0];
+      setFrom(that);
+      return;
+    }
+
+    // 指定 from, to, options, complete
+    if(maxLength === 3){
+      that.paramObj['from'] = that.args[0];
+      that.paramObj['to'] = that.args[1];
+      parseOptions(that, that.args[2]);
+      that.optionObj['complete'] = that.args[3];
+      return;
+    }
+
+    // complete の指定がある
+    if(typeof that.args[maxLength] === 'function'){
+      that.optionObj['complete'] = that.args[maxLength];
+    }
+
+    // 引数が２つ指定されている
+    if(maxLength === 1){
+      // 指定 to, complete
+      if(typeof that.optionObj['complete'] === 'function'){
+        that.paramObj['to'] = that.args[0];
+        setFrom(that);
+        that.optionObj = defaults;
+        return;
+      }else{
+        rtn = parseOptions(that, that.args[1]);
+        // 指定 to, options
+        if(rtn == true){
+          that.paramObj['to'] = that.args[0];
+          setFrom(that);
+          return;
+        // 指定 from, to
+        }else{
+          that.paramObj['from'] = that.args[0];
+          that.paramObj['to'] = that.args[1];
+          return;
+        }
+      }
+    }
+
+    // 指定 from, to, options
+    if(typeof that.optionObj['complete'] !== 'function'){
+      that.paramObj['from'] = that.args[0];
+      that.paramObj['to'] = that.args[1];
+      parseOptions(that, that.args[2]);
+      return;
+    }
+
+    rtn = parseOptions(that, that.args[1]);
+    // 指定 to, options, complete
+    if(rtn != false){
+      that.paramObj['to'] = that.args[0];
+      setFrom(that);
+      return;
+    // 指定 from, to, complete
+    }else{
+      that.paramObj['from'] = that.args[0];
+      that.paramObj['to'] = that.args[1];
+      return;
+    }
+  }
+
+  /**
+   * アニメーションクラス
+   */
+  var AnimateClass = function(target, args){
+    this.target = target;
+    this.hash = (+new Date());
+    this.args = args;
+    this.paramObj = new Object;
+    this.optionObj = new Object;
+  }
+
+  AnimateClass.prototype = {
+    // パラメーターをセットする
+    setArgments : function(){
+      setArgments(this);
+    },
+    
+    // ルールをスタイルシートとして出力する
+    setStyle : function(){
+      var tmpFrom = new Array,
+          tmpTo = new Array;
+      styleElm = document.createElement('style');
+      styleElm.type = 'text/css';
+      styleElm.media = 'screen';
+      $('head')[0].appendChild(styleElm);
+      for (key in this.paramObj['from']) {
+        tmpFrom.push(key.replace(/([A-Z])/g, '-$1').toLowerCase() + ':' + this.paramObj['from'][key]);
+      }
+      for (key in this.paramObj['to']) {
+        tmpTo.push(key.replace(/([A-Z])/g, '-$1').toLowerCase() + ':' + this.paramObj['to'][key]);
+      }
+      styleElm.appendChild(document.createTextNode('@' + vender + 'keyframes anim_' + this.hash + '{from{' + tmpFrom.join(';') + '} to{' + tmpTo.join(';') + '}}'));
+      styleArr[this.hash] = styleElm;
+      delete tmpFrom, tmpTo;
+    }
+  }
+
 
   // メソッド
   var methods = {
-    start : function(elm){
-      $(elm).css(vender + 'animation-play-state', 'running');
-      return elm;
-    }, 
-    stop : function(elm){
-      $(elm).css(vender + 'animation-play-state', 'paused');
-      return elm;
-    },
-    toggle : function(elm){
-      if($(elm).css(vender + 'animation-play-state') == 'running'){
-        $(elm).css(vender + 'animation-play-state', 'paused');
+    // アニメーションの開始
+    start : function(target){
+      // paused の場合、再開する
+      if($(target).css(vender + 'animation-play-state') == 'paused'){
+        $(target).css(vender + 'animation-play-state', 'running');
       }else{
-        $(elm).css(vender + 'animation-play-state', 'running');        
+        // アニメーションの適用
+        $(target).css($(target).data('animaRules'));
       }
-      return elm;
+      return target;
+    }, 
+    // アニメーションの停止
+    stop : function(target){
+      $(target).css(vender + 'animation-play-state', 'paused');
+      return target;
     },
-    status : function(elm){
-      return $(elm).css(vender + 'animation-play-state');
+    // アニメーションの停止、開始をトグル
+    toggle : function(target){
+      if($(target).css(vender + 'animation-play-state') == 'paused'){
+        $(target).css(vender + 'animation-play-state', 'running');        
+      }else{
+        methods['start'](target);
+      }
+      return target;
+    },
+    // アニメーションの状態を返す
+    status : function(target){
+      if($(target).css(vender + 'animation-play-state') == 'paused'){
+        return 'paused';
+      }
+      var tmpIsAnima = $(target).data('isAnima');
+      if (tmpIsAnima !== undefined) {
+        var tmpAnimaCss = $(target).css(vender + 'animation-name');
+        if(tmpAnimaCss == 'anim_' + tmpIsAnima){
+          return 'running';
+        }
+        return 'init';
+      }
+      return undefined;
+    },
+    // アニメーションの初期設定
+    init : function(target, args){
+      var animateClass = new AnimateClass(target, args);
+
+      animateClass.setArgments();
+      animateClass.setStyle();
+
+      // 過去のスタイルシートを削除する
+      var tmpIsAnima = animateClass.target.data('isAnima');
+      if (tmpIsAnima !== undefined) {
+        $(styleArr[tmpIsAnima]).remove();
+        animateClass.target.off('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd');
+      }
+      delete tmpIsAnima;
+      // 実行アニメーションのハッシュキーを保持する
+      animateClass.target.data('isAnima', animateClass.hash);
+      
+      // アニメーション終了時の処理
+      animateClass.target.on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', 
+        function(e) {
+          e.stopPropagation();
+          animateClass.target.off('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd');
+
+          // コールバック処理
+          if(typeof animateClass.optionObj['complete'] === 'function'){
+            animateClass.optionObj['complete'](e);
+          }
+        }
+      );
+      var tmpRules = new Object;
+      tmpRules[vender + 'animation-duration'] = animateClass.optionObj['duration'];
+      tmpRules[vender + 'animation-fill-mode'] = animateClass.optionObj['fillMode'];
+      tmpRules[vender + 'animation-delay'] = animateClass.optionObj['delay'];
+      tmpRules[vender + 'animation-timing-function'] = animateClass.optionObj['timingFunction'];
+      tmpRules[vender + 'animation-iteration-count'] = animateClass.optionObj['iterationCount'];
+      tmpRules[vender + 'animation-direction'] = animateClass.optionObj['direction'];
+      tmpRules[vender + 'animation-name'] = 'anim_' + animateClass.hash;
+      animateClass.target.data('animaRules', tmpRules);
+      delete tmpRules;
+      delete animateClass;
+      return target;
     }
   }
   
@@ -73,273 +339,17 @@
      * @return  メソッドの実行対象となったオブジェクトを返す。チェーン処理可能。
      */
     css3animate : function(arg0, arg1, arg2, arg3) {
-      var
-        target = this,
-        from,
-        to,
-        duration = '400ms',
-        fillMode = 'both',
-        delay = '0ms',
-        timingFunction = 'ease',
-        iterationCount = '1',
-        direction = 'normal',
-        complete,
-        hash = (+new Date());
-
-      // メソッド指定の場合はメソッドとして処理する
       if(typeof arguments[0] === 'string'){
-        rtn = methods[arguments[0]](target);
-        return rtn;
-      }
-
-      /**
-       * 引数の設定
-       * 引数の省略状況を判断して、適切なパラメーターに代入する
-       * @param  arg  css3animateに渡された引数プロパティ
-       */
-      var setArgment = function(arg){
-        var maxLength = arg.length - 1;
-
-        // 指定 to 
-        if(maxLength === 0){
-          to = arg[0];
-          from = setFrom();
-          return;
+        var tmpArgs = new Array();
+        for(var i=1, ii=0, length=arguments.length; i<length; i++,ii++){
+          tmpArgs[ii] = arguments[i];
         }
-
-        // 指定 from, to, options, complete
-        if(maxLength === 3){
-          from = arg[0];
-          to = arg[1];
-          parseOptions(arg[2]);
-          complete = arg[3];
-          return;
-        }
-
-        // complete の指定がある
-        if(typeof arg[maxLength] === 'function'){
-          complete = arg[maxLength];
-        }
-
-        // 引数が２つ指定されている
-        if(maxLength === 1){
-          // 指定 to, complete
-          if(typeof complete === 'function'){
-            to = arg[0];
-            from = setFrom();
-            return;
-          // 指定 to, options
-          }else if(parseOptions(arg[1])){
-            to = arg[0];
-            from = setFrom();
-            return; 
-          // 指定 from, to
-          }else{
-            from = arg[0];
-            to = arg[1];
-            return;
-          }
-        }
-
-        // 指定 from, to, options
-        if(typeof complete !== 'function'){
-          from = arg[0];
-          to = arg[1];
-          parseOptions(arg[2]);
-          return;
-        }
-
-        // 指定 to, options, complete
-        if(parseOptions(arg[1])){
-          to = arg[0];
-          from = setFrom();
-          return; 
-        // 指定 from, to, complete
-        }else{
-          from = arg[0];
-          to = arg[1];
-          return;
-        }
-      }
-
-
-      /**
-       * オプションを分解する
-       * @param  options  CSS3 のAnimaionメソッドに定義されたの各種オプション
-       * @return  boolen  true : 渡されたオブジェクトがoptionsだった場合。  false : optionsではなかった場合。
-       */
-      var parseOptions = function(options){
-        var rtn = false;
-        if(options['duration'] != undefined){
-          duration = options['duration'] + 'ms';
-          rtn = true;
-        }
-        if(options['fillMode'] != undefined){
-          fillMode = options['fillMode'];
-          rtn = true;
-        }
-        if(options['delay'] != undefined){
-          delay = options['delay'] + 'ms';
-          rtn = true;
-        }
-        if(options['timingFunction'] != undefined){
-          timingFunction = options['timingFunction'];
-          switch(timingFunction){
-            case 'expo-in':
-              timingFunction = 'cubic-bezier(0.71,0.01,0.83,0)';
-              break;
-            case 'expo-out':
-              timingFunction = 'cubic-bezier(0.14,1,0.32,0.99)';
-              break;
-            case 'expo-in-out':
-              timingFunction = 'cubic-bezier(0.85,0,0.15,1)';
-              break;
-            case 'circ-in':
-              timingFunction = 'cubic-bezier(0.34,0,0.96,0.23)';
-              break;
-            case 'circ-out':
-              timingFunction = 'cubic-bezier(0,0.5,0.37,0.98)';
-              break;
-            case 'circ-in-out':
-              timingFunction = 'cubic-bezier(0.88,0.1,0.12,0.9)';
-              break;
-            case 'sine-in':
-              timingFunction = 'cubic-bezier(0.22,0.04,0.36,0)';
-              break;
-            case 'sine-out':
-              timingFunction = 'cubic-bezier(0.04,0,0.5,1)';
-              break;
-            case 'sine-in-out':
-              timingFunction = 'cubic-bezier(0.37,0.01,0.63,1)';
-              break;
-            case 'quad-in':
-              timingFunction = 'cubic-bezier(0.14,0.01,0.49,0)';
-              break;
-            case 'quad-out':
-              timingFunction = 'cubic-bezier(0.01,0,0.43,1)';
-              break;
-            case 'quad-in-out':
-              timingFunction = 'cubic-bezier(0.47,0.04,0.53,0.96)';
-              break;
-            case 'cubic-in':
-              timingFunction = 'cubic-bezier(0.35,0,0.65,0)';
-              break;
-            case 'cubic-out':
-              timingFunction = 'cubic-bezier(0.09,0.25,0.24,1)';
-              break;
-            case 'cubic-in-out':
-              timingFunction = 'cubic-bezier(0.66,0,0.34,1)';
-              break;
-            case 'quart-in':
-              timingFunction = 'cubic-bezier(0.69,0,0.76,0.17)';
-              break;
-            case 'quart-out':
-              timingFunction = 'cubic-bezier(0.26,0.96,0.44,1)';
-              break;
-            case 'quart-in-out':
-              timingFunction = 'cubic-bezier(0.76,0,0.24,1)';
-              break;
-            case 'quint-in':
-              timingFunction = 'cubic-bezier(0.64,0,0.78,0)';
-              break;
-            case 'quint-out':
-              timingFunction = 'cubic-bezier(0.22,1,0.35,1)';
-              break;
-            case 'quint-in-out':
-              timingFunction = 'cubic-bezier(0.9,0,0.1,1)';
-              break;            
-          }
-          rtn = true;
-        }
-        if(options['iterationCount'] != undefined){
-          iterationCount = options['iterationCount'];
-          if(typeof iterationCount == 'number'){
-            iterationCount = String(iterationCount);
-          }
-          rtn = true;
-        }
-        if(options['direction'] != undefined){
-          direction = options['direction'];
-          rtn = true;
-        }
-        return rtn;
-      }
-
-
-      /**
-       * 省略されたfromパラメータの設定
-       * @return  対象オブジェクトのtoに対応する現在のCSSプロパティ
-       */
-      var setFrom = function(){
-        var tmp = new Object;
-        for (key in to) {
-          tmp[key] = target.css(key);
-        }
-        return tmp;
-      }
-
-      // ルールをスタイルシートとして出力
-      var tmpFrom = new Array,
-          tmpTo = new Array;
-      setArgment(arguments);
-      styleElm = document.createElement('style');
-      styleElm.type = 'text/css';
-      styleElm.media = 'screen';
-      $('head')[0].appendChild(styleElm);
-      for (key in from) {
-        tmpFrom.push(key.replace(/([A-Z])/g, '-$1').toLowerCase() + ':' + from[key]);
-      }
-      for (key in to) {
-        tmpTo.push(key.replace(/([A-Z])/g, '-$1').toLowerCase() + ':' + to[key]);
-      }
-      styleElm.appendChild(document.createTextNode('@' + vender + 'keyframes anim_' + hash + '{from{' + tmpFrom.join(';') + '} to{' + tmpTo.join(';') + '}}'));
-      styleArr[hash] = styleElm;
-      delete tmpFrom, tmpTo;
-
-      // 実行アニメーションのハッシュキーを保持する
-      var tmpIsAnima = target.data('isAnima');
-      if (tmpIsAnima !== undefined) {
-        // 過去のアニメーションの確認
-        for (key in tmpIsAnima) {
-          // 過去のスタイルシートを削除する
-          $(styleArr[tmpIsAnima[key]]).remove();
-          target.off('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd');
-          target.data('isAnima').splice(key, 1);
-        }
-        target.data('isAnima').push(hash);
+        return methods[arguments[0]](this, tmpArgs);
       }else{
-        var tmpIsAnima = new Array;
-        tmpIsAnima[0] = hash;
-        target.data('isAnima', tmpIsAnima);
+        methods['init'](this, arguments);
+        methods['start'](this);
+        return this;
       }
-      delete tmpIsAnima;        
-
-      // アニメーション終了時の処理
-      target.on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', 
-          function(e) {
-            e.stopPropagation();
-            target.off('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd');
-
-            // コールバック処理
-            if(typeof complete === 'function'){
-              complete(e);
-            }
-          }
-      );
-
-      // アニメーションの適用
-      var tmpRules = new Object;
-      tmpRules[vender + 'animation-duration'] = duration;
-      tmpRules[vender + 'animation-fill-mode'] = fillMode;
-      tmpRules[vender + 'animation-delay'] = delay;
-      tmpRules[vender + 'animation-timing-function'] = timingFunction;
-      tmpRules[vender + 'animation-iteration-count'] = iterationCount;
-      tmpRules[vender + 'animation-direction'] = direction;
-      tmpRules[vender + 'animation-name'] = 'anim_' + hash;
-      rulesArr[hash] = tmpRules;
-      delete tmpRules;
-      target.css(rulesArr[hash]);
-      return target;
     }
   });
 });

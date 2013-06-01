@@ -103,18 +103,27 @@ CSS3 アニメーションの animation-directionに相当。
 ## メソッド
 以下のメソッドを用意しています。  
 
+* init  `jQuery(selector).css3animate ('init', [from,] to [,options] [,complete])`  
+アニメーションの設定のみを行います。この時点ではアニメーションせず、start メソッドによってアニメーションを開始します。  
+
+* start `jQuery(selector).css3animate ('start')`  
+initメソッドで設定、またはsotpメソッドによって停止したアニメーションを開始します。  
+
 * stop `jQuery(selector).css3animate ('stop')`  
 動作中のアニメーションを一時停止します。  
 
-* start `jQuery(selector).css3animate ('start')`  
-一時停止中のアニメーションを再開します。  
-
 * toggle `jQuery(selector).css3animate ('toggle')`  
-アニメーションが一時停止中であれば再開、動作中であれば一時停止します。  
+アニメーションがinitメソッド、またはstopメソッドによって停止中であれば開始、動作中であれば一時停止します。  
 
 * status `jQuery(selector).css3animate ('status')`  
 アニメーションの動作状態を返します。動作中であれば'running'、一時停止中であれば'paused'を返します。  
 
+
+</tr>
+<tr>
+<td>status</td>
+<td><code>jQuery(selector).css3animate ('status')</code></td>
+<td>アニメーションの動作状態を返す。動作中であれば<code>running</code>、一時停止中であれば<code>paused</code>、設定のみであれば<code>init</code>、設定がなければ<code>undefined</code>を返す</td>
 
 ## デモサイト
 
