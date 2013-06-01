@@ -116,14 +116,8 @@ initメソッドで設定、またはsotpメソッドによって停止したア
 アニメーションがinitメソッド、またはstopメソッドによって停止中であれば開始、動作中であれば一時停止します。  
 
 * status `jQuery(selector).css3animate ('status')`  
-アニメーションの動作状態を返します。動作中であれば'running'、一時停止中であれば'paused'を返します。  
+アニメーションの動作状態を返します。動作中であれば'running'、一時停止中であれば'paused'、設定のみであれば'init'、設定がなければ'undefined'を返します。  
 
-
-</tr>
-<tr>
-<td>status</td>
-<td><code>jQuery(selector).css3animate ('status')</code></td>
-<td>アニメーションの動作状態を返す。動作中であれば<code>running</code>、一時停止中であれば<code>paused</code>、設定のみであれば<code>init</code>、設定がなければ<code>undefined</code>を返す</td>
 
 ## デモサイト
 
