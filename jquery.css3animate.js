@@ -1,10 +1,10 @@
 /**
- * jquery.css3animate.js v1.3.0
+ * jquery.css3animate.js v1.3.1
  *
  * Copyright 2013 Zannen Form
  * Released under the MIT license
  * 
- * Date: 2013-06-01
+ * Date: 2013-06-02
  */
 
 (function(module) {
@@ -136,37 +136,23 @@
   var setArgments = function(that){
     var maxLength = that.args.length - 1;
 
-    // 指定 to 
-    if(maxLength === 0){
-      that.optionObj = defaults;
-      that.paramObj['to'] = that.args[0];
-      setFrom(that);
-      return;
-    }
-
-    // 指定 from, to, options, complete
-    if(maxLength === 3){
-      that.paramObj['from'] = that.args[0];
-      that.paramObj['to'] = that.args[1];
-      parseOptions(that, that.args[2]);
-      that.optionObj['complete'] = that.args[3];
-      return;
-    }
-
-    // complete の指定がある
-    if(typeof that.args[maxLength] === 'function'){
-      that.optionObj['complete'] = that.args[maxLength];
-    }
-
-    // 引数が２つ指定されている
-    if(maxLength === 1){
-      // 指定 to, complete
-      if(typeof that.optionObj['complete'] === 'function'){
+    switch(maxLength){
+      case 0:
+        // 指定 to 
         that.paramObj['to'] = that.args[0];
         setFrom(that);
         that.optionObj = defaults;
         return;
-      }else{
+        break;
+      case 1:
+        // 指定 to, complete
+        if(typeof that.args[maxLength] === 'function'){
+          that.paramObj['to'] = that.args[0];
+          setFrom(that);
+          that.optionObj = defaults;
+          that.completeObj = that.args[maxLength];
+          return;
+        }
         rtn = parseOptions(that, that.args[1]);
         // 指定 to, options
         if(rtn == true){
@@ -179,28 +165,38 @@
           that.paramObj['to'] = that.args[1];
           return;
         }
-      }
-    }
-
-    // 指定 from, to, options
-    if(typeof that.optionObj['complete'] !== 'function'){
-      that.paramObj['from'] = that.args[0];
-      that.paramObj['to'] = that.args[1];
-      parseOptions(that, that.args[2]);
-      return;
-    }
-
-    rtn = parseOptions(that, that.args[1]);
-    // 指定 to, options, complete
-    if(rtn != false){
-      that.paramObj['to'] = that.args[0];
-      setFrom(that);
-      return;
-    // 指定 from, to, complete
-    }else{
-      that.paramObj['from'] = that.args[0];
-      that.paramObj['to'] = that.args[1];
-      return;
+        break;
+      case 2:
+        // 指定 from, to, options
+        if(typeof that.args[maxLength] !== 'function'){
+          that.paramObj['from'] = that.args[0];
+          that.paramObj['to'] = that.args[1];
+          parseOptions(that, that.args[2]);
+          return;
+        }
+        rtn = parseOptions(that, that.args[1]);
+        // 指定 to, options, complete
+        if(rtn != false){
+          that.paramObj['to'] = that.args[0];
+          setFrom(that);
+          that.completeObj = that.args[maxLength];
+          return;
+        // 指定 from, to, complete
+        }else{
+          that.paramObj['from'] = that.args[0];
+          that.paramObj['to'] = that.args[1];
+          that.completeObj = that.args[maxLength];
+          return;
+        }
+        break;
+      case 3:
+        // 指定 from, to, options, complete
+        that.paramObj['from'] = that.args[0];
+        that.paramObj['to'] = that.args[1];
+        parseOptions(that, that.args[2]);
+        that.completeObj = that.args[3];
+        return;
+        break;        
     }
   }
 
@@ -213,6 +209,7 @@
     this.args = args;
     this.paramObj = new Object;
     this.optionObj = new Object;
+    this.completeObj = new Object;
   }
 
   AnimateClass.prototype = {
@@ -308,8 +305,8 @@
           animateClass.target.off('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd');
 
           // コールバック処理
-          if(typeof animateClass.optionObj['complete'] === 'function'){
-            animateClass.optionObj['complete'](e);
+          if(typeof animateClass.completeObj === 'function'){
+            animateClass.completeObj(e);
           }
         }
       );
